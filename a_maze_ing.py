@@ -67,17 +67,27 @@ if __name__ == "__main__":
             if if_error:
                 sys.exit(1)
         #===============================================#
-            arr = [["F" for i in range(width)] for j in range(height)]
-            arr_string = ""
-            for item in arr:
-                for hx in item:
-                    arr_string += hx
-                arr_string += "\n"
+        generatemaze = MazeGenerator(
+            width, height,
+              is_perfect, entry_x,
+                entry_y, exit_x, exit_y
+            )
+        arr_numbers = generatemaze.back_trackinga_agorithm()
+        for list in arr_numbers:
+            line = []
+            for num in list:
+                line.append(str(num))
         #==============================================#
-            with open(f"{argument["OUTPUT_FILE"]}", "w") as output:
-                output.write(arr_string + "\n")
-                output.write(argument["ENTRY"] + "\n")
-                output.write(argument["EXIT"] + "\n")
+        with open(f"{argument["OUTPUT_FILE"]}", "w") as output:
+            for list in arr_numbers:
+                line = []
+                string = ""
+                for num in list:
+                    line.append(str(hex(num))[2:])
+                    string = "".join(line)
+                output.write(string + "\n")
+            output.write(argument["ENTRY"] + "\n")
+            output.write(argument["EXIT"] + "\n")
 
         
         

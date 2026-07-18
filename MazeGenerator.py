@@ -17,15 +17,12 @@ class MazeGenerator():
         self.exit_y = exit_y
 
 
-    def back_trackinga_agorithm(self):
+    def back_trackinga_agorithm(self) -> list[int]:
         direction = {"N": 1, "E": 8, "S": 4, "W": 2}
-
         self.arr = [[15 for i in range(self.width)] for j in range(self.height)]
         print(self.arr)
         self.num_cells = self.width * self.height
         self.visited_cells = []
-        self.first_cell = (self.entry_x, self.entry_y)
-        self.dist_cell = (self.exit_x, self.exit_y)
         self.visited_cells.append(((random.randint(0, self.width - 1), ((random.randint(0, self.height - 1))))))
         print(self.visited_cells)
         while self.visited_cells:
@@ -51,20 +48,19 @@ class MazeGenerator():
                 print(val)
                 if val == (1, 0):
                     self.arr[y][x] -= 2
-                    self.arr[y][x - 1] -= 8
+                    self.arr[y1][x1] -= 8
                 elif val == (-1, 0):
                     self.arr[y][x] -= 8
-                    self.arr[y][x + 1] -= 2
+                    self.arr[y1][x1] -= 2
                 elif val == (0, 1):
                     self.arr[y][x] -= 1
-                    self.arr[y - 1][x] -= 4
+                    self.arr[y1][x1] -= 4
                 elif val == (0, -1):
                     self.arr[y][x] -= 4
-                    self.arr[y + 1][x] -= 1
+                    self.arr[y1][x1] -= 1
                 self.visited_cells.append(chosen)
             else:
                 self.visited_cells.pop()
-
-
-test = MazeGenerator(5, 5, True, 0, 0, 5, 5)
-test.back_trackinga_agorithm()
+        self.arr[self.entry_y][self.entry_x] -= 2
+        self.arr[self.exit_y][self.exit_x]  -= 8
+        return self.arr
