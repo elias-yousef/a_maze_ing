@@ -26,13 +26,13 @@ if __name__ == "__main__":
             # check for the argument
             #=================================================#
             if_error = False
+            list_ranges = []
             try:
                 width = int(argument["WIDTH"])
                 height = int(argument["HEIGHT"])
             except ValueError as e:
                 if_error = True
                 print("width and height must be int values")
-
             try:
                 if argument["PERFECT"] not in ("True", "False"):
                     raise ValueError
@@ -44,7 +44,6 @@ if __name__ == "__main__":
             except ValueError as e:
                 if_error = True
                 print("PERFECT must be 'True' or 'False'")
-
             try:
                 entry = argument["ENTRY"].split(",")
                 exit = argument["EXIT"].split(",")
@@ -53,6 +52,18 @@ if __name__ == "__main__":
             except ValueError as e:
                 if_error = True
                 print("ENTRY and EXIT point must be x,y int values")
+            if entry_x > width or entry_x < 0:
+                list_ranges.append("ENTRY_X out of range")
+            if exit_x > width or exit_x < 0:
+                list_ranges.append("EXIT_X out of range")
+            if entry_y > height or entry_y < 0:
+                list_ranges.append("ENTRY_Y out of range")
+            if exit_y > height or exit_y < 0:
+                list_ranges.append("EXIT_Y out of range")
+            if list_ranges:
+                for error in list_ranges:
+                    print(error)
+                if_error = True
             if if_error:
                 sys.exit(1)
         #===============================================#
