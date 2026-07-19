@@ -73,6 +73,8 @@ if __name__ == "__main__":
                 entry_y, exit_x, exit_y
             )
         arr_numbers = generatemaze.back_trackinga_agorithm()
+        if is_perfect == False:
+            arr_numbers =  generatemaze.imperfect()
         for list in arr_numbers:
             line = []
             for num in list:
