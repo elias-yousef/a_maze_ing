@@ -72,23 +72,23 @@ class MazeGenerator():
         length = (self.width * self.height) - (self.height * 2 - 2) - (self.width * 2 - 2) # fix this later i think it works
         while length > 0:
             if (( #delete from S -> N
-                (self.arr[y + 1][x + 1] & 4) == 4 or (
-                    self.arr[y + 1][x + 1] & 2) == 2 or (
+                (self.arr[y - 1][x + 1] & 4) == 4 or (
+                    self.arr[y - 1][x + 1] & 2) == 2 or (
                         self.arr[y][x + 1] & 2) == 2) and (
-                            (self.arr[y + 1][x - 1] & 8) == 8 or (
-                                self.arr[y + 1][x - 1] & 4) == 4 or (
+                            (self.arr[y - 1][x - 1] & 8) == 8 or (
+                                self.arr[y - 1][x - 1] & 4) == 4 or (
                                     self.arr[y][x - 1] & 8) == 8) and (
                                         (self.arr[y][x] & 1) == 1
                                     )
                     ):
                 if random.random() < 0.3:
                     self.arr[y][x] -= 1
-                    self.arr[y + 1][x] -= 4
+                    self.arr[y - 1][x] -= 4
             if (( #delete from N -> S
-                (self.arr[y - 1][x + 1] & 2) == 2 or (
-                    self.arr[y - 1][x + 1] & 1) == 1 or (
-                        self.arr[y][x + 1] & 4) == 4) and (
-                            (self.arr[y - 1][x - 1] & 8) == 8 or (
+                (self.arr[y + 1][x + 1] & 2) == 2 or (
+                    self.arr[y + 1][x + 1] & 1) == 1 or (
+                        self.arr[y][x + 1] & 2) == 2) and (
+                            (self.arr[y + 1][x - 1] & 8) == 8 or (
                                 self.arr[y - 1][x - 1] & 1) == 1 or (
                                     self.arr[y][x - 1] & 8) == 8) and (
                                         (self.arr[y][x] & 4) == 4
@@ -96,14 +96,14 @@ class MazeGenerator():
                     ):
                 if random.random() < 0.3:
                     self.arr[y][x] -= 4
-                    self.arr[y - 1][x] -= 1
+                    self.arr[y + 1][x] -= 1
             if (( # delete from W -> E
-                (self.arr[y + 1][x + 1] & 2) == 2 or (
-                    self.arr[y + 1][x + 1] & 4) == 4 or (
-                        self.arr[y + 1][x] & 4) == 4) and (
-                            (self.arr[y - 1][x + 1] & 1) == 1 or (
-                                self.arr[y - 1][x + 1] & 2) == 2 or (
-                                    self.arr[y - 1][x] & 1) == 1) and (
+                (self.arr[y - 1][x + 1] & 2) == 2 or (
+                    self.arr[y - 1][x + 1] & 4) == 4 or (
+                        self.arr[y - 1][x] & 4) == 4) and (
+                            (self.arr[y + 1][x + 1] & 1) == 1 or (
+                                self.arr[y + 1][x + 1] & 2) == 2 or (
+                                    self.arr[y + 1][x] & 1) == 1) and (
                                         (self.arr[y][x] & 8) == 8
                                     )
                     ):
@@ -111,16 +111,16 @@ class MazeGenerator():
                     self.arr[y][x] -= 8
                     self.arr[y][x + 1] -= 2
             if (( # delete from E -> W
-                (self.arr[y + 1][x - 1] & 8) == 8 or (
-                    self.arr[y + 1][x - 1] & 4) == 4 or (
-                        self.arr[y + 1][x] & 4) == 4) and (
-                            (self.arr[y - 1][x - 1] & 1) == 1 or (
-                                self.arr[y - 1][x - 1] & 8) == 8 or (
-                                    self.arr[y - 1][x] & 1) == 1) and (
+                (self.arr[y - 1][x - 1] & 8) == 8 or (
+                    self.arr[y - 1][x - 1] & 4) == 4 or (
+                        self.arr[y - 1][x] & 4) == 4) and (
+                            (self.arr[y + 1][x - 1] & 1) == 1 or (
+                                self.arr[y + 1][x - 1] & 8) == 8 or (
+                                    self.arr[y + 1][x] & 1) == 1) and (
                                         (self.arr[y][x] & 2) == 2
                                     )
                     ):
-                if random.random() < 0.3: # i was here
+                if random.random() < 0.3:
                     self.arr[y][x] -= 2
                     self.arr[y][x - 1] -= 8
             x += 1
