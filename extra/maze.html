@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Matrix Maze Visualizer</title>
+    <style>
+        body { 
+            font-family: system-ui, sans-serif; 
+            background-color: #1e1e1e; 
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+        }
+        canvas { 
+            background-color: #fff; 
+            border: 4px solid #333;
+            border-radius: 4px;
+            margin-top: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+    <h2>Hex Matrix Visualizer - Imperfect Maze V2</h2>
+    <canvas id="mazeCanvas" width="900" height="900"></canvas>
+
+    <script>
+        const mazeData = [
+            "11795393955395155555393b951553",
+            "a838386a8112c38117950686a90512",
+            "c68280106ae852aa8529438382a92a",
+            "952aaaa87c1292806904146c2aaa86",
+            "85400284152aac285285055146842b",
+            "a912a8694144294292850138114382",
+            "86ac043c1691401028692a82ac382a",
+            "c1290141412852aa841682aaa942aa",
+            "9286a8143ac052aa83a92a82ac382a",
+            "e84386812a9416c02ac2a828452ac6",
+            "9412816a82852916843a86aa950293",
+            "812868386a8142e9412c43a843a86a",
+            "aa86d2c2906814147ac15284128452",
+            "ac01503c683a814138381403ac0792",
+            "812852a956806c3a8686abaa8143aa",
+            "aa843c0413a8514281052a8468506e",
+            "a843850528041052aac50005143853",
+            "c2bc29416ac168786c552a85014012",
+            "900380505296941411514287ac52aa",
+            "aaa82c1012a9050128143c4129502a",
+            "ac2ac12aa86a856aaaa9453a8016aa",
+            "816812aaa8140110042c1546aac16a",
+            "ac3aa86ac6a96aaa85294511043c16",
+            "a94282d2b90452868504516a8503ab",
+            "843c2c140285504541439016c12ac2",
+            "c52941692c05385154142a8552ac12",
+            "91445452810540545529684392c56a",
+            "a8551392aa83929395685294285156",
+            "ac552c686868686c053c3843a8383b",
+            "c5554556d454545545456c7c46c6c4"
+        ];
+
+        // Official assignment logic
+        const N = 1;
+        const E = 2;
+        const S = 4;
+        const W = 8;
+        
+        const cellSize = 30;
+        const ctx = document.getElementById("mazeCanvas").getContext("2d");
+
+        const bitsAreWalls = true; 
+
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = "#000";
+        ctx.lineCap = "square";
+
+        for (let y = 0; y < mazeData.length; y++) {
+            let row = mazeData[y];
+            for (let x = 0; x < row.length; x++) {
+                let val = parseInt(row[x], 16);
+
+                let hasN = (val & N) !== 0;
+                let hasW = (val & W) !== 0;
+                let hasS = (val & S) !== 0;
+                let hasE = (val & E) !== 0;
+
+                let drawN = bitsAreWalls ? hasN : !hasN;
+                let drawW = bitsAreWalls ? hasW : !hasW;
+                let drawS = bitsAreWalls ? hasS : !hasS;
+                let drawE = bitsAreWalls ? hasE : !hasE;
+
+                let px = x * cellSize;
+                let py = y * cellSize;
+
+                ctx.beginPath();
+                if (drawN) { ctx.moveTo(px, py); ctx.lineTo(px + cellSize, py); }
+                if (drawS) { ctx.moveTo(px, py + cellSize); ctx.lineTo(px + cellSize, py + cellSize); }
+                if (drawE) { ctx.moveTo(px + cellSize, py); ctx.lineTo(px + cellSize, py + cellSize); }
+                if (drawW) { ctx.moveTo(px, py); ctx.lineTo(px, py + cellSize); }
+                ctx.stroke();
+            }
+        }
+    </script>
+</body>
+</html>
