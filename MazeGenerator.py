@@ -1,6 +1,5 @@
-import numpy as np
 import random
-import sys
+from collections import deque
 
 class MazeGenerator():
     def __init__(
@@ -162,3 +161,11 @@ class MazeGenerator():
                 x = 1
             length -= 1
         return self.arr
+
+    def DBF(self):
+        come_from = {}
+        start = self.entry_x, self.entry_y
+        exit = self.exit_x, self.exit_y
+        come_from[start] = None
+        while True:
+            pass
