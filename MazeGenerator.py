@@ -1,6 +1,5 @@
-import numpy as np
 import random
-import sys
+from collections import deque
 
 class MazeGenerator():
     def __init__(
@@ -40,8 +39,6 @@ class MazeGenerator():
             self.point_42.append((x + 2, y + 2))
             self.point_42.append((x + 3, y + 2))
         return self.point_42
-
-
 
     def back_trackinga_agorithm(self) -> list[int]: #width and height index error fix it
         direction = {"N": 1, "E": 2, "S": 4, "W": 8}
@@ -162,3 +159,67 @@ class MazeGenerator():
                 x = 1
             length -= 1
         return self.arr
+
+    def BFS(self):
+        start = self.entry_x, self.entry_y
+        end = self.exit_x, self.exit_y
+        skipped_point = self.pattern_42()
+        paths = {}
+        visited = set()
+        paths[start] = None
+        queue = deque([start])
+        while queue:
+            curr_point = queue.popleft()
+            x, y = curr_point
+            if curr_point == end:
+                break
+            if curr_point != end:
+                if x >= 1:
+                    if not (self.arr[y][x - 1] & 8):
+                        if (x - 1, y) not in skipped_point and (x - 1, y) not in visited:
+                            queue.append((x - 1, y))
+                            visited.add((x - 1, y))
+                            paths[(x - 1, y)] = (x, y)
+                if x < self.width - 1:
+                    if not (self.arr[y][x + 1] & 2):
+                        if (x + 1, y) not in skipped_point and (x + 1, y) not in visited:
+                            queue.append((x + 1, y))
+                            visited.add((x + 1, y))
+                            paths[(x + 1, y)] = (x, y)
+                if y >= 1:
+                    if not (self.arr[y - 1][x] & 1):
+                        if (x, y - 1) not in skipped_point and (x, y - 1) not in visited:
+                            queue.append((x, y - 1))
+                            visited.add((x, y - 1))
+                            paths[(x, y - 1)] = (x, y)
+                if y < self.height - 1:
+                    if not (self.arr[y + 1][x] & 4):
+                        if (x, y + 1) not in skipped_point and (x, y + 1) not in visited:
+                            queue.append((x, y + 1))
+                            visited.add((x, y + 1))
+                            paths[(x, y + 1)] = (x, y)
+        final_path = []
+        curr = end
+        while curr is not None:
+            final_path.append(curr)
+            curr = paths[curr]
+        final_path = final_path[::-1]
+        direction = ""
+        for i in range(len(final_path) - 1):
+            curr_x, curr_y = final_path[i]
+            next_x, next_y = final_path[i + 1]
+            dx = next_x - curr_x
+            dy = next_y - curr_y
+            if dy == -1:
+                direction += "N"
+            elif dy == 1:
+                direction += "S"
+            elif dx == 1:
+                direction += "E"
+            elif dx == -1:
+                direction += "W"
+        return direction
+            
+
+
+    

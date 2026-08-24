@@ -75,6 +75,7 @@ if __name__ == "__main__":
         arr_numbers = generatemaze.back_trackinga_agorithm()
         if is_perfect == False:
             arr_numbers =  generatemaze.imperfect()
+        direction = generatemaze.BFS(arr_numbers)
         for list in arr_numbers:
             line = []
             for num in list:
