@@ -75,7 +75,8 @@ if __name__ == "__main__":
         arr_numbers = generatemaze.back_trackinga_agorithm()
         if is_perfect == False:
             arr_numbers =  generatemaze.imperfect()
-        direction = generatemaze.BFS(arr_numbers)
+        direction = generatemaze.solve_maze_bfs()
+        generatemaze.draw_maze()
         for list in arr_numbers:
             line = []
             for num in list:
@@ -89,8 +90,9 @@ if __name__ == "__main__":
                     line.append(str(hex(num))[2:])
                     string = "".join(line)
                 output.write(string + "\n")
-            output.write(argument["ENTRY"] + "\n")
+            output.write("\n" + argument["ENTRY"] + "\n")
             output.write(argument["EXIT"] + "\n")
+            output.write(direction + "\n")
 
         
         

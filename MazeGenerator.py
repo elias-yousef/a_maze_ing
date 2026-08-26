@@ -44,11 +44,9 @@ class MazeGenerator():
         direction = {"N": 1, "E": 2, "S": 4, "W": 8}
         skipped_point = self.pattern_42()
         self.arr = [[15 for i in range(self.width)] for j in range(self.height)]
-        print(self.arr)
         self.num_cells = self.width * self.height
         self.visited_cells = []
         self.visited_cells.append(((random.randint(0, self.width - 1), ((random.randint(0, self.height - 1))))))
-        print(self.visited_cells)
         while self.visited_cells:
             self.next_cell = []
             x, y = self.visited_cells[-1]
@@ -73,7 +71,6 @@ class MazeGenerator():
                 x1, y1 = chosen
                 x, y = self.visited_cells[-1]
                 val = ((x - x1) , (y - y1))
-                print(val)
                 if val == (1, 0):
                     self.arr[y][x] -= 8
                     self.arr[y1][x1] -= 2
@@ -89,7 +86,6 @@ class MazeGenerator():
                 self.visited_cells.append(chosen)
             else:
                 self.visited_cells.pop()
-        print(self.arr)
         return self.arr
     
     def imperfect(self) -> list[int]:
@@ -159,3 +155,122 @@ class MazeGenerator():
                 x = 1
             length -= 1
         return self.arr
+
+    def solve_maze_bfs(self):
+        start = (self.entry_x, self.entry_y)
+        end = (self.exit_x, self.exit_y)
+        skipped_point = self.pattern_42()
+        
+        visited = set()
+        visited.add(start)
+        paths = {start: None}
+        queue = deque([start])
+        
+        while queue:
+            curr_point = queue.popleft()
+            if curr_point == end:
+                break 
+            x, y = curr_point
+            if x >= 1 and not (self.arr[y][x] & 8):
+                neighbor = (x - 1, y)
+                if neighbor not in skipped_point and neighbor not in visited:
+                    queue.append(neighbor)
+                    visited.add(neighbor)
+                    paths[neighbor] = curr_point
+
+            if x < self.width - 1 and not (self.arr[y][x] & 2):
+                neighbor = (x + 1, y)
+                if neighbor not in skipped_point and neighbor not in visited:
+                    queue.append(neighbor)
+                    visited.add(neighbor)
+                    paths[neighbor] = curr_point
+
+            if y >= 1 and not (self.arr[y][x] & 1):
+                neighbor = (x, y - 1)
+                if neighbor not in skipped_point and neighbor not in visited:
+                    queue.append(neighbor)
+                    visited.add(neighbor)
+                    paths[neighbor] = curr_point
+
+            if y < self.height - 1 and not (self.arr[y][x] & 4):
+                neighbor = (x, y + 1)
+                if neighbor not in skipped_point and neighbor not in visited:
+                    queue.append(neighbor)
+                    visited.add(neighbor)
+                    paths[neighbor] = curr_point
+        final_path = []
+        current = end
+        while current is not None:
+            final_path.append(current)
+            current = paths[current]
+            
+        final_path = final_path[::-1]
+        
+        direction_string = ""
+        for i in range(len(final_path) - 1):
+            curr_x, curr_y = final_path[i]
+            next_x, next_y = final_path[i + 1]
+            dx = next_x - curr_x
+            dy = next_y - curr_y
+            
+            if dy == -1: direction_string += "N"
+            elif dy == 1: direction_string += "S"
+            elif dx == 1: direction_string += "E"
+            elif dx == -1: direction_string += "W"
+                
+        return direction_string
+
+    def draw_maze(self):
+        scale = 5
+        room_width = ((scale - 1) * self.width) + 1
+        room_hight = ((scale - 1) * self.height) + 1
+
+        empty = [[" " for _ in range(room_hight)] for _ in range(room_width)]
+        for logical_y in range(self.height):
+            for logical_x in range(self.height):
+                vis_y = logical_y * (scale - 1)
+                vis_x = logical_x * (scale - 1)
+                if self.arr[logical_y][logical_x] & 1:
+                    for i in range(scale):
+                        empty[vis_y][vis_x + i] = "-"
+                    empty[vis_y][vis_x + (scale - 1)] = "+"
+                    empty[vis_y][vis_x] = "+"
+
+                if self.arr[logical_y][logical_x] & 2:
+                    for i in range(scale):
+                        empty[vis_y + i][vis_x + (scale - 1)] = "|"
+                    empty[vis_y + (scale - 1)][vis_x + (scale - 1)] = "+"
+                    empty[vis_y][vis_x + (scale - 1)] = "+"
+
+                if self.arr[logical_y][logical_x] & 4:
+                    for i in range(scale):
+                        empty[vis_y + (scale - 1)][vis_x + i] = "-"
+                    empty[vis_y + (scale - 1)][vis_x + (scale - 1)] = "+"
+                    empty[vis_y + (scale - 1)][vis_x] = "+"
+
+                if self.arr[logical_y][logical_x] & 8:
+                    for i in range(scale):
+                        empty[vis_y + i][vis_x] = "|"
+                    empty[vis_y + (scale - 1)][vis_x] = "+"
+                    empty[vis_y][vis_x] = "+"
+        for row in empty:
+            print("".join(row))
+ 
+            #if arr_numbers[logical_y][logical_x] & 4 and arr_numbers[logical_y][logical_x] & 2:
+                #empty[vis_y + (scale - 1)][vis_x + (scale - 1)] = "*"
+
+            #if arr_numbers[logical_y][logical_x] & 8 and arr_numbers[logical_y][logical_x] & 1:
+                #empty[vis_y][vis_x] = "*"
+
+            #if arr_numbers[logical_y][logical_x] & 8 and arr_numbers[logical_y][logical_x] & 4:
+                #empty[vis_y + (scale - 1)][vis_x] = "*"
+
+            #if arr_numbers[logical_y][logical_x] & 1 and arr_numbers[logical_y][logical_x] & 2:
+                #empty[vis_y][vis_x + (scale - 1)] = "*"
+
+
+                
+            
+            
+                 
+
