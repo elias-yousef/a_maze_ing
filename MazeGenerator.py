@@ -46,6 +46,7 @@ class MazeGenerator():
         self.arr = [[15 for i in range(self.width)] for j in range(self.height)]
         self.num_cells = self.width * self.height
         self.visited_cells = []
+        # should be fixed it sometime generate a wrong mazes
         self.visited_cells.append(((random.randint(0, self.width - 1), ((random.randint(0, self.height - 1))))))
         while self.visited_cells:
             self.next_cell = []
@@ -206,71 +207,60 @@ class MazeGenerator():
             
         final_path = final_path[::-1]
         
-        direction_string = ""
+        self.direction_string = ""
         for i in range(len(final_path) - 1):
             curr_x, curr_y = final_path[i]
             next_x, next_y = final_path[i + 1]
             dx = next_x - curr_x
             dy = next_y - curr_y
             
-            if dy == -1: direction_string += "N"
-            elif dy == 1: direction_string += "S"
-            elif dx == 1: direction_string += "E"
-            elif dx == -1: direction_string += "W"
+            if dy == -1: self.direction_string += "N"
+            elif dy == 1: self.direction_string += "S"
+            elif dx == 1: self.direction_string += "E"
+            elif dx == -1: self.direction_string += "W"
                 
-        return direction_string
+        return self.direction_string
 
     def draw_maze(self):
-        scale = 5
-        room_width = ((scale - 1) * self.width) + 1
-        room_hight = ((scale - 1) * self.height) + 1
+        scale_x = 7
+        scale_y = 5
+        self.seed = True
+        room_width = ((scale_x - 1) * self.width) + 1
+        room_hight = ((scale_y - 1) * self.height) + 1
 
-        empty = [[" " for _ in range(room_hight)] for _ in range(room_width)]
+        empty = [[" " for _ in range(room_width)] for _ in range(room_hight)]
+        
         for logical_y in range(self.height):
-            for logical_x in range(self.height):
-                vis_y = logical_y * (scale - 1)
-                vis_x = logical_x * (scale - 1)
+            for logical_x in range(self.width):
+                vis_y = logical_y * (scale_y - 1)
+                vis_x = logical_x * (scale_x - 1)
+                # North Wall (1)
                 if self.arr[logical_y][logical_x] & 1:
-                    for i in range(scale):
+                    for i in range(scale_x):
                         empty[vis_y][vis_x + i] = "-"
-                    empty[vis_y][vis_x + (scale - 1)] = "+"
+                    empty[vis_y][vis_x + (scale_x - 1)] = "+"
                     empty[vis_y][vis_x] = "+"
 
+                # East Wall (2)
                 if self.arr[logical_y][logical_x] & 2:
-                    for i in range(scale):
-                        empty[vis_y + i][vis_x + (scale - 1)] = "|"
-                    empty[vis_y + (scale - 1)][vis_x + (scale - 1)] = "+"
-                    empty[vis_y][vis_x + (scale - 1)] = "+"
+                    for i in range(scale_y):
+                        empty[vis_y + i][vis_x + (scale_x - 1)] = "|"
+                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = "+"
+                    empty[vis_y][vis_x + (scale_x - 1)] = "+"
 
+                # South Wall (4)
                 if self.arr[logical_y][logical_x] & 4:
-                    for i in range(scale):
-                        empty[vis_y + (scale - 1)][vis_x + i] = "-"
-                    empty[vis_y + (scale - 1)][vis_x + (scale - 1)] = "+"
-                    empty[vis_y + (scale - 1)][vis_x] = "+"
+                    for i in range(scale_x):
+                        empty[vis_y + (scale_y - 1)][vis_x + i] = "-"
+                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = "+"
+                    empty[vis_y + (scale_y - 1)][vis_x] = "+"
 
+                # West Wall (8)
                 if self.arr[logical_y][logical_x] & 8:
-                    for i in range(scale):
+                    for i in range(scale_y):
                         empty[vis_y + i][vis_x] = "|"
-                    empty[vis_y + (scale - 1)][vis_x] = "+"
+                    empty[vis_y + (scale_y - 1)][vis_x] = "+"
                     empty[vis_y][vis_x] = "+"
+                    
         for row in empty:
             print("".join(row))
- 
-            #if arr_numbers[logical_y][logical_x] & 4 and arr_numbers[logical_y][logical_x] & 2:
-                #empty[vis_y + (scale - 1)][vis_x + (scale - 1)] = "*"
-
-            #if arr_numbers[logical_y][logical_x] & 8 and arr_numbers[logical_y][logical_x] & 1:
-                #empty[vis_y][vis_x] = "*"
-
-            #if arr_numbers[logical_y][logical_x] & 8 and arr_numbers[logical_y][logical_x] & 4:
-                #empty[vis_y + (scale - 1)][vis_x] = "*"
-
-            #if arr_numbers[logical_y][logical_x] & 1 and arr_numbers[logical_y][logical_x] & 2:
-                #empty[vis_y][vis_x + (scale - 1)] = "*"
-
-
-                
-            
-            
-                 
-
