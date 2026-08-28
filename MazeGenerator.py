@@ -229,7 +229,8 @@ class MazeGenerator():
         room_hight = ((scale_y - 1) * self.height) + 1
 
         empty = [[" " for _ in range(room_width)] for _ in range(room_hight)]
-        
+        curr_x = self.entry_x
+        curr_y = self.entry_y
         for logical_y in range(self.height):
             for logical_x in range(self.width):
                 vis_y = logical_y * (scale_y - 1)
@@ -261,6 +262,24 @@ class MazeGenerator():
                         empty[vis_y + i][vis_x] = "|"
                     empty[vis_y + (scale_y - 1)][vis_x] = "+"
                     empty[vis_y][vis_x] = "+"
-                    
+        for direction in self.direction_string:
+            vis_x = curr_x * (scale_x - 1)
+            vis_y = curr_y * (scale_y - 1)
+            if direction == "N":
+                curr_y -= 1 
+                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
+            elif direction == "S":
+                curr_y += 1
+                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
+            elif direction == "E":
+                curr_x += 1
+                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
+            elif direction == "W":
+                curr_x -= 1
+                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
+        empty[(self.exit_y * (scale_y - 1)) + scale_y // 2][(self.exit_x * (scale_x - 1)) + scale_x // 2] = "E"
+        empty[(self.entry_y * (scale_y - 1)) + scale_y // 2][(self.entry_x * (scale_x - 1)) + scale_x // 2] = "S"
+            
+
         for row in empty:
             print("".join(row))
