@@ -1,6 +1,7 @@
 import random
 from collections import deque
 
+
 class MazeGenerator():
     def __init__(
             self, width: int, height: int, is_perfect: bool,
@@ -14,8 +15,9 @@ class MazeGenerator():
         self.entry_y = entry_y
         self.exit_x = exit_x
         self.exit_y = exit_y
-    
-    def pattern_42(self) -> list[int]:
+        self.direction_string: str = ""
+
+    def pattern_42(self) -> list[tuple[int, int]]:
         self.point_42 = []
         if self.width > 9 and self.height > 7:
             x = self.width // 2
@@ -40,14 +42,15 @@ class MazeGenerator():
             self.point_42.append((x + 3, y + 2))
         return self.point_42
 
-    def back_trackinga_agorithm(self) -> list[int]: #width and height index error fix it
-        direction = {"N": 1, "E": 2, "S": 4, "W": 8}
+    def back_trackinga_agorithm(self) -> list[list[int]]:
         skipped_point = self.pattern_42()
-        self.arr = [[15 for i in range(self.width)] for j in range(self.height)]
+        self.arr = [[15 for i in range(
+            self.width)] for j in range(self.height)]
         self.num_cells = self.width * self.height
         self.visited_cells = []
         # should be fixed it sometime generate a wrong mazes
-        self.visited_cells.append(((random.randint(0, self.width - 1), ((random.randint(0, self.height - 1))))))
+        self.visited_cells.append(((random.randint(
+            0, self.width - 1), ((random.randint(0, self.height - 1))))))
         while self.visited_cells:
             self.next_cell = []
             x, y = self.visited_cells[-1]
@@ -71,7 +74,7 @@ class MazeGenerator():
                 chosen = random.choice(self.next_cell)
                 x1, y1 = chosen
                 x, y = self.visited_cells[-1]
-                val = ((x - x1) , (y - y1))
+                val = ((x - x1), (y - y1))
                 if val == (1, 0):
                     self.arr[y][x] -= 8
                     self.arr[y1][x1] -= 2
@@ -88,13 +91,15 @@ class MazeGenerator():
             else:
                 self.visited_cells.pop()
         return self.arr
-    
-    def imperfect(self) -> list[int]:
+
+    def imperfect(self) -> list[list[int]]:
         x = 1
         y = 1
-        length = (self.width * self.height) - (self.height * 2 - 2) - (self.width * 2 - 2) # fix this later i think it works
+        length = (
+            self.width * self.height) - (
+                self.height * 2 - 2) - (self.width * 2 - 2)
         while length > 0:
-            if (( #delete from S -> N
+            if ((
                 (self.arr[y - 1][x + 1] & 4) == 4 or (
                     self.arr[y - 1][x + 1] & 8) == 8 or (
                         self.arr[y][x + 1] & 8) == 8) and (
@@ -102,13 +107,11 @@ class MazeGenerator():
                                 self.arr[y - 1][x - 1] & 4) == 4 or (
                                     self.arr[y][x - 1] & 2) == 2) and (
                                         (self.arr[y][x] & 1) == 1
-                                    )
-                    ):
-                if random.random() < 0.3:
-                    if self.arr[y - 1][x] != 15 and self.arr[y][x] != 15:
-                        self.arr[y][x] -= 1
-                        self.arr[y - 1][x] -= 4
-            if (( #delete from N -> S
+                                    )):
+                if self.arr[y - 1][x] != 15 and self.arr[y][x] != 15:
+                    self.arr[y][x] -= 1
+                    self.arr[y - 1][x] -= 4
+            if ((
                 (self.arr[y + 1][x + 1] & 8) == 8 or (
                     self.arr[y + 1][x + 1] & 1) == 1 or (
                         self.arr[y][x + 1] & 8) == 8) and (
@@ -116,13 +119,11 @@ class MazeGenerator():
                                 self.arr[y + 1][x - 1] & 1) == 1 or (
                                     self.arr[y][x - 1] & 2) == 2) and (
                                         (self.arr[y][x] & 4) == 4
-                                    )
-                    ):
-                if random.random() < 0.3:
-                    if self.arr[y + 1][x] != 15 and self.arr[y][x] != 15:
-                        self.arr[y + 1][x] -= 1
-                        self.arr[y][x] -= 4
-            if (( # delete from W -> E
+                                    )):
+                if self.arr[y + 1][x] != 15 and self.arr[y][x] != 15:
+                    self.arr[y + 1][x] -= 1
+                    self.arr[y][x] -= 4
+            if ((
                 (self.arr[y - 1][x + 1] & 8) == 8 or (
                     self.arr[y - 1][x + 1] & 4) == 4 or (
                         self.arr[y - 1][x] & 4) == 4) and (
@@ -130,13 +131,11 @@ class MazeGenerator():
                                 self.arr[y + 1][x + 1] & 8) == 8 or (
                                     self.arr[y + 1][x] & 1) == 1) and (
                                         (self.arr[y][x] & 2) == 2
-                                    )
-                    ):
-                if random.random() < 0.3:
-                    if self.arr[y][x + 1] != 15 and self.arr[y][x] != 15:
-                        self.arr[y][x] -= 2
-                        self.arr[y][x + 1] -= 8
-            if (( # delete from E -> W
+                                    )):
+                if self.arr[y][x + 1] != 15 and self.arr[y][x] != 15:
+                    self.arr[y][x] -= 2
+                    self.arr[y][x + 1] -= 8
+            if ((
                 (self.arr[y - 1][x - 1] & 2) == 2 or (
                     self.arr[y - 1][x - 1] & 4) == 4 or (
                         self.arr[y - 1][x] & 4) == 4) and (
@@ -144,12 +143,10 @@ class MazeGenerator():
                                 self.arr[y + 1][x - 1] & 2) == 2 or (
                                     self.arr[y + 1][x] & 1) == 1) and (
                                         (self.arr[y][x] & 8) == 8
-                                    )
-                    ):
-                if random.random() < 0.3:
-                    if self.arr[y][x - 1] != 15 and self.arr[y][x] != 15:
-                        self.arr[y][x] -= 8
-                        self.arr[y][x - 1] -= 2
+                                    )):
+                if self.arr[y][x - 1] != 15 and self.arr[y][x] != 15:
+                    self.arr[y][x] -= 8
+                    self.arr[y][x - 1] -= 2
             x += 1
             if x == self.width - 1:
                 y += 1
@@ -157,20 +154,20 @@ class MazeGenerator():
             length -= 1
         return self.arr
 
-    def solve_maze_bfs(self):
+    def solve_maze_bfs(self) -> str:
         start = (self.entry_x, self.entry_y)
         end = (self.exit_x, self.exit_y)
         skipped_point = self.pattern_42()
-        
+
         visited = set()
         visited.add(start)
-        paths = {start: None}
+        paths: dict[tuple[int, int], tuple[int, int] | None] = {start: None}
         queue = deque([start])
-        
+
         while queue:
             curr_point = queue.popleft()
             if curr_point == end:
-                break 
+                break
             x, y = curr_point
             if x >= 1 and not (self.arr[y][x] & 8):
                 neighbor = (x - 1, y)
@@ -200,28 +197,32 @@ class MazeGenerator():
                     visited.add(neighbor)
                     paths[neighbor] = curr_point
         final_path = []
-        current = end
+        current: tuple[int, int] | None = end
         while current is not None:
             final_path.append(current)
             current = paths[current]
-            
+
         final_path = final_path[::-1]
-        
+
         self.direction_string = ""
         for i in range(len(final_path) - 1):
             curr_x, curr_y = final_path[i]
             next_x, next_y = final_path[i + 1]
             dx = next_x - curr_x
             dy = next_y - curr_y
-            
-            if dy == -1: self.direction_string += "N"
-            elif dy == 1: self.direction_string += "S"
-            elif dx == 1: self.direction_string += "E"
-            elif dx == -1: self.direction_string += "W"
-                
+
+            if dy == -1:
+                self.direction_string += "N"
+            elif dy == 1:
+                self.direction_string += "S"
+            elif dx == 1:
+                self.direction_string += "E"
+            elif dx == -1:
+                self.direction_string += "W"
+
         return self.direction_string
 
-    def draw_maze(self, show_hide: bool, color: int):
+    def draw_maze(self, show_hide: bool, color: int) -> None:
         WHITE = '\033[37m'
         RED = '\033[91m'
         GREEN = '\033[92m'
@@ -265,15 +266,20 @@ class MazeGenerator():
                 # East Wall (2)
                 if self.arr[logical_y][logical_x] & 2:
                     for i in range(scale_y):
-                        empty[vis_y + i][vis_x + (scale_x - 1)] = c + "|" + RESET
-                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = c + "+" + RESET
-                    empty[vis_y][vis_x + (scale_x - 1)] = c + "+" + RESET
+                        empty[vis_y + i][vis_x + (
+                            scale_x - 1)] = c + "|" + RESET
+                    empty[vis_y + (scale_y - 1)][vis_x + (
+                        scale_x - 1)] = c + "+" + RESET
+                    empty[vis_y][vis_x + (
+                        scale_x - 1)] = c + "+" + RESET
 
                 # South Wall (4)
                 if self.arr[logical_y][logical_x] & 4:
                     for i in range(scale_x):
-                        empty[vis_y + (scale_y - 1)][vis_x + i] = c + "-" + RESET
-                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = c + "+" + RESET
+                        empty[vis_y + (
+                            scale_y - 1)][vis_x + i] = c + "-" + RESET
+                    empty[vis_y + (scale_y - 1)][vis_x + (
+                        scale_x - 1)] = c + "+" + RESET
                     empty[vis_y + (scale_y - 1)][vis_x] = c + "+" + RESET
 
                 # West Wall (8)
@@ -287,18 +293,28 @@ class MazeGenerator():
                 vis_x = curr_x * (scale_x - 1)
                 vis_y = curr_y * (scale_y - 1)
                 if direction == "N":
-                    curr_y -= 1 
-                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = w + "o" + RESET
+                    curr_y -= 1
+                    empty[vis_y + scale_y // 2][
+                        vis_x + scale_x // 2] = w + "o" + RESET
                 elif direction == "S":
                     curr_y += 1
-                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = w +  "o" + RESET
+                    empty[vis_y + scale_y // 2][
+                        vis_x + scale_x // 2] = w + "o" + RESET
                 elif direction == "E":
                     curr_x += 1
-                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] =  w + "o" + RESET
+                    empty[vis_y + scale_y // 2][
+                        vis_x + scale_x // 2] = w + "o" + RESET
                 elif direction == "W":
                     curr_x -= 1
-                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = w + "o" + RESET
-            empty[(self.entry_y * (scale_y - 1)) + scale_y // 2][(self.entry_x * (scale_x - 1)) + scale_x // 2] = RED + "S" + RESET
-            empty[(self.exit_y * (scale_y - 1)) + scale_y // 2][(self.exit_x * (scale_x - 1)) + scale_x // 2] = GREEN + "E" + RESET
+                    empty[vis_y + scale_y // 2][
+                        vis_x + scale_x // 2] = w + "o" + RESET
+            empty[(
+                self.entry_y * (scale_y - 1)) + scale_y // 2][(
+                    self.entry_x * (
+                        scale_x - 1)) + scale_x // 2] = RED + "S" + RESET
+            empty[(
+                self.exit_y * (scale_y - 1)) + scale_y // 2][(
+                    self.exit_x * (
+                        scale_x - 1)) + scale_x // 2] = GREEN + "E" + RESET
         for row in empty:
             print("".join(row))

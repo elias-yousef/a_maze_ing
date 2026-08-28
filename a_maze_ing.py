@@ -2,7 +2,7 @@ import sys
 from MazeGenerator import MazeGenerator
 
 
-def parse_config(file_path):
+def parse_config(file_path: str) -> dict[str, str]:
     """Reads the configuration file and returns a dictionary of arguments."""
     argument = {}
     mandatory = ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"]
@@ -11,7 +11,7 @@ def parse_config(file_path):
         for line in text_file:
             if line.startswith("#") or line.strip() == "":
                 continue
-            
+
             data = line.split("=")
             argument[data[0].strip()] = data[1].strip()
 
@@ -23,8 +23,11 @@ def parse_config(file_path):
     return argument
 
 
-def validate_arguments(argument):
-    """Validates the parsed arguments and ensures they are the correct data types/bounds """
+def validate_arguments(
+        argument: dict[str, str]
+        ) -> tuple[int, int, bool, int, int, int, int]:
+    """Validates the parsed arguments and ensures
+    they are the correct data types/bounds """
     if_error = False
     list_ranges = []
 
@@ -42,7 +45,7 @@ def validate_arguments(argument):
         perfect_val = argument["PERFECT"].lower()
         if perfect_val not in ("true", "false"):
             raise ValueError
-        is_perfect = (perfect_val == "True")
+        is_perfect = (perfect_val == "true")
     except ValueError:
         if_error = True
         print("PERFECT must be 'True/ture' or 'False/false'")
@@ -80,7 +83,7 @@ def validate_arguments(argument):
     return width, height, is_perfect, entry_x, entry_y, exit_x, exit_y
 
 
-def main():
+def main() -> None:
     if len(sys.argv) < 2:
         print("missing config file")
         sys.exit(1)
@@ -88,13 +91,14 @@ def main():
     # 1. Read and Validate Config
     config_file = sys.argv[1]
     argument = parse_config(config_file)
-    width, height, is_perfect, entry_x, entry_y, exit_x, exit_y = validate_arguments(argument)
+    (width, height, is_perfect, entry_x,
+        entry_y, exit_x, exit_y) = validate_arguments(argument)
 
     # 2. Initialize MazeGenerator
     generatemaze = MazeGenerator(
         width, height,
-        is_perfect, 
-        entry_x, entry_y, 
+        is_perfect,
+        entry_x, entry_y,
         exit_x, exit_y
     )
 
@@ -110,9 +114,9 @@ def main():
         print("2. Show/Hide path from entry to exit")
         print("3. Rotate the maze color")
         print("4. Quit")
-        
+
         choice = input("Choice? (1-4) -> Chose 1 first to generate the maze: ")
-        
+
         try:
             num = int(choice)
         except ValueError:
@@ -127,13 +131,10 @@ def main():
         if num == 1:
             first_try = False
             arr_numbers = generatemaze.back_trackinga_agorithm()
-            
             if not is_perfect:
                 arr_numbers = generatemaze.imperfect()
-                
             direction = generatemaze.solve_maze_bfs()
             generatemaze.draw_maze(False, color)
-            
             # Write results to the output file
             output_file_path = argument["OUTPUT_FILE"]
             with open(output_file_path, "w") as output:
@@ -141,7 +142,6 @@ def main():
                     # Convert to hex strings directly
                     line_chars = [str(hex(n))[2:] for n in row]
                     output.write("".join(line_chars) + "\n")
-                    
                 output.write("\n" + argument["ENTRY"] + "\n")
                 output.write(argument["EXIT"] + "\n")
                 output.write(direction + "\n")
@@ -162,14 +162,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-            
-
-            
-
-        
-        
-        
-
-
-            
