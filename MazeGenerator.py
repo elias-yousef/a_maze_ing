@@ -48,9 +48,12 @@ class MazeGenerator():
             self.width)] for j in range(self.height)]
         self.num_cells = self.width * self.height
         self.visited_cells = []
-        # should be fixed it sometime generate a wrong mazes
-        self.visited_cells.append(((random.randint(
-            0, self.width - 1), ((random.randint(0, self.height - 1))))))
+        while True:
+            start_x = random.randint(0, self.width - 1)
+            start_y = random.randint(0, self.height - 1)
+            if (start_x, start_y) not in skipped_point:
+                break
+        self.visited_cells.append((start_x, start_y))
         while self.visited_cells:
             self.next_cell = []
             x, y = self.visited_cells[-1]
