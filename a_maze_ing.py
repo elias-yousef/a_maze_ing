@@ -2,97 +2,170 @@ import sys
 from MazeGenerator import MazeGenerator
 
 
-if __name__ == "__main__":
+def parse_config(file_path):
+    """Reads the configuration file and returns a dictionary of arguments."""
+    argument = {}
+    mandatory = ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"]
+
+    with open(file_path, 'r') as text_file:
+        for line in text_file:
+            if line.startswith("#") or line.strip() == "":
+                continue
+            
+            data = line.split("=")
+            argument[data[0].strip()] = data[1].strip()
+
+    for item in mandatory:
+        if item not in argument:
+            print(f"CRITICAL ERROR: missing required_item={item}")
+            sys.exit(1)
+
+    return argument
+
+
+def validate_arguments(argument):
+    """Validates the parsed arguments and ensures they are the correct data types/bounds """
+    if_error = False
+    list_ranges = []
+
+    width = height = entry_x = entry_y = exit_x = exit_y = 0
+    is_perfect = False
+
+    try:
+        width = int(argument["WIDTH"])
+        height = int(argument["HEIGHT"])
+    except ValueError:
+        if_error = True
+        print("width and height must be int values")
+
+    try:
+        perfect_val = argument["PERFECT"].lower()
+        if perfect_val not in ("true", "false"):
+            raise ValueError
+        is_perfect = (perfect_val == "True")
+    except ValueError:
+        if_error = True
+        print("PERFECT must be 'True/ture' or 'False/false'")
+
+    try:
+        entry = argument["ENTRY"].split(",")
+        exit_pts = argument["EXIT"].split(",")
+        entry_x, entry_y = int(entry[0]), int(entry[1])
+        exit_x, exit_y = int(exit_pts[0]), int(exit_pts[1])
+    except (ValueError, IndexError):
+        if_error = True
+        print("ENTRY and EXIT point must be x,y int values")
+
+    # 4. Check boundaries (only if parsing succeeded)
+    if not if_error:
+        if entry_x > width or entry_x < 0:
+            list_ranges.append("ENTRY_X out of range")
+        if exit_x > width or exit_x < 0:
+            list_ranges.append("EXIT_X out of range")
+        if entry_y > height or entry_y < 0:
+            list_ranges.append("ENTRY_Y out of range")
+        if exit_y > height or exit_y < 0:
+            list_ranges.append("EXIT_Y out of range")
+
+    # Print range errors if any exist
+    if list_ranges:
+        for error in list_ranges:
+            print(error)
+        if_error = True
+
+    # Exit if any validation failed
+    if if_error:
+        sys.exit(1)
+
+    return width, height, is_perfect, entry_x, entry_y, exit_x, exit_y
+
+
+def main():
     if len(sys.argv) < 2:
         print("missing config file")
-    else:
-        # passing the argument
-        mandatory = ["WIDTH", "HEIGHT", "ENTRY", "EXIT", "OUTPUT_FILE", "PERFECT"]
-        argument = {}
-        text_file = sys.argv[1]
-        with open(text_file, 'r') as text_file:
-            for line in text_file:
-                if line.startswith("#") or line.startswith("\n"):
-                    pass
-                else:
-                    data = line.split("=")
-                    argument[data[0].strip()] = data[1].strip()
-            print(argument)
-            for items in mandatory:
-                if items not in argument:
-                    print(f"CRITICAL ERROR:  missing required_item={items}")
-                    sys.exit(1)
-            print(f"all required items are in {sys.argv[1]}")
-            # check for the argument
-            #=================================================#
-            if_error = False
-            list_ranges = []
-            try:
-                width = int(argument["WIDTH"])
-                height = int(argument["HEIGHT"])
-            except ValueError as e:
-                if_error = True
-                print("width and height must be int values")
-            try:
-                if argument["PERFECT"] not in ("True", "False"):
-                    raise ValueError
-                else:
-                    if argument["PERFECT"] == "True":
-                        is_perfect = True
-                    elif argument["PERFECT"] == "False":
-                        is_perfect = False
-            except ValueError as e:
-                if_error = True
-                print("PERFECT must be 'True' or 'False'")
-            try:
-                entry = argument["ENTRY"].split(",")
-                exit = argument["EXIT"].split(",")
-                entry_x, entry_y = int(entry[0]), int(entry[1])
-                exit_x, exit_y = int(exit[0]), int(exit[1])
-            except ValueError as e:
-                if_error = True
-                print("ENTRY and EXIT point must be x,y int values")
-            if entry_x > width or entry_x < 0:
-                list_ranges.append("ENTRY_X out of range")
-            if exit_x > width or exit_x < 0:
-                list_ranges.append("EXIT_X out of range")
-            if entry_y > height or entry_y < 0:
-                list_ranges.append("ENTRY_Y out of range")
-            if exit_y > height or exit_y < 0:
-                list_ranges.append("EXIT_Y out of range")
-            if list_ranges:
-                for error in list_ranges:
-                    print(error)
-                if_error = True
-            if if_error:
-                sys.exit(1)
-        #===============================================#
-        generatemaze = MazeGenerator(
-            width, height,
-              is_perfect, entry_x,
-                entry_y, exit_x, exit_y
-            )
-        arr_numbers = generatemaze.back_trackinga_agorithm()
-        if is_perfect == False:
-            arr_numbers =  generatemaze.imperfect()
-        direction = generatemaze.solve_maze_bfs()
-        generatemaze.draw_maze()
-        for list in arr_numbers:
-            line = []
-            for num in list:
-                line.append(str(num))
-        #==============================================#
-        with open(f"{argument["OUTPUT_FILE"]}", "w") as output:
-            for list in arr_numbers:
-                line = []
-                string = ""
-                for num in list:
-                    line.append(str(hex(num))[2:])
-                    string = "".join(line)
-                output.write(string + "\n")
-            output.write("\n" + argument["ENTRY"] + "\n")
-            output.write(argument["EXIT"] + "\n")
-            output.write(direction + "\n")
+        sys.exit(1)
+
+    # 1. Read and Validate Config
+    config_file = sys.argv[1]
+    argument = parse_config(config_file)
+    width, height, is_perfect, entry_x, entry_y, exit_x, exit_y = validate_arguments(argument)
+
+    # 2. Initialize MazeGenerator
+    generatemaze = MazeGenerator(
+        width, height,
+        is_perfect, 
+        entry_x, entry_y, 
+        exit_x, exit_y
+    )
+
+    # 3. Setup Menu Variables
+    draw = False
+    first_try = True
+    color = 0
+
+    # 4. Main Application Loop
+    while True:
+        print("*===* A-Maze-ing *===*")
+        print("1. Generate a new maze")
+        print("2. Show/Hide path from entry to exit")
+        print("3. Rotate the maze color")
+        print("4. Quit")
+        
+        choice = input("Choice? (1-4) -> Chose 1 first to generate the maze: ")
+        
+        try:
+            num = int(choice)
+        except ValueError:
+            continue
+
+        # Force the user to choose 1 first
+        if first_try and num != 1:
+            print("\n === Please chose one for the first time === \n")
+            continue
+
+        # Handle Menu Choices
+        if num == 1:
+            first_try = False
+            arr_numbers = generatemaze.back_trackinga_agorithm()
+            
+            if not is_perfect:
+                arr_numbers = generatemaze.imperfect()
+                
+            direction = generatemaze.solve_maze_bfs()
+            generatemaze.draw_maze(False, color)
+            
+            # Write results to the output file
+            output_file_path = argument["OUTPUT_FILE"]
+            with open(output_file_path, "w") as output:
+                for row in arr_numbers:
+                    # Convert to hex strings directly
+                    line_chars = [str(hex(n))[2:] for n in row]
+                    output.write("".join(line_chars) + "\n")
+                    
+                output.write("\n" + argument["ENTRY"] + "\n")
+                output.write(argument["EXIT"] + "\n")
+                output.write(direction + "\n")
+
+        elif num == 2:
+            draw = not draw
+            generatemaze.draw_maze(draw, color)
+
+        elif num == 3:
+            color += 1
+            if color == 4:
+                color = 0
+            generatemaze.draw_maze(draw, color)
+
+        elif num == 4:
+            break
+
+
+if __name__ == "__main__":
+    main()
+
+            
+
+            
 
         
         

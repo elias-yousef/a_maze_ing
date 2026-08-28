@@ -221,7 +221,27 @@ class MazeGenerator():
                 
         return self.direction_string
 
-    def draw_maze(self):
+    def draw_maze(self, show_hide: bool, color: int):
+        WHITE = '\033[37m'
+        RED = '\033[91m'
+        GREEN = '\033[92m'
+        BLUE = '\033[94m'
+        WELLOW = '\033[93m'
+        MAGENTA = '\033[95m'
+        CYAN = '\033[96m'
+        RESET = '\033[0m'
+        if color == 0:
+            c = WHITE
+            w = GREEN
+        elif color == 1:
+            c = RED
+            w = WELLOW
+        elif color == 2:
+            c = GREEN
+            w = MAGENTA
+        elif color == 3:
+            c = BLUE
+            w = CYAN
         scale_x = 7
         scale_y = 5
         self.seed = True
@@ -238,48 +258,47 @@ class MazeGenerator():
                 # North Wall (1)
                 if self.arr[logical_y][logical_x] & 1:
                     for i in range(scale_x):
-                        empty[vis_y][vis_x + i] = "-"
-                    empty[vis_y][vis_x + (scale_x - 1)] = "+"
-                    empty[vis_y][vis_x] = "+"
+                        empty[vis_y][vis_x + i] = c + "-" + RESET
+                    empty[vis_y][vis_x + (scale_x - 1)] = c + "+" + RESET
+                    empty[vis_y][vis_x] = c + "+" + RESET
 
                 # East Wall (2)
                 if self.arr[logical_y][logical_x] & 2:
                     for i in range(scale_y):
-                        empty[vis_y + i][vis_x + (scale_x - 1)] = "|"
-                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = "+"
-                    empty[vis_y][vis_x + (scale_x - 1)] = "+"
+                        empty[vis_y + i][vis_x + (scale_x - 1)] = c + "|" + RESET
+                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = c + "+" + RESET
+                    empty[vis_y][vis_x + (scale_x - 1)] = c + "+" + RESET
 
                 # South Wall (4)
                 if self.arr[logical_y][logical_x] & 4:
                     for i in range(scale_x):
-                        empty[vis_y + (scale_y - 1)][vis_x + i] = "-"
-                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = "+"
-                    empty[vis_y + (scale_y - 1)][vis_x] = "+"
+                        empty[vis_y + (scale_y - 1)][vis_x + i] = c + "-" + RESET
+                    empty[vis_y + (scale_y - 1)][vis_x + (scale_x - 1)] = c + "+" + RESET
+                    empty[vis_y + (scale_y - 1)][vis_x] = c + "+" + RESET
 
                 # West Wall (8)
                 if self.arr[logical_y][logical_x] & 8:
                     for i in range(scale_y):
-                        empty[vis_y + i][vis_x] = "|"
-                    empty[vis_y + (scale_y - 1)][vis_x] = "+"
-                    empty[vis_y][vis_x] = "+"
-        for direction in self.direction_string:
-            vis_x = curr_x * (scale_x - 1)
-            vis_y = curr_y * (scale_y - 1)
-            if direction == "N":
-                curr_y -= 1 
-                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
-            elif direction == "S":
-                curr_y += 1
-                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
-            elif direction == "E":
-                curr_x += 1
-                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
-            elif direction == "W":
-                curr_x -= 1
-                empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = "o"
-        empty[(self.exit_y * (scale_y - 1)) + scale_y // 2][(self.exit_x * (scale_x - 1)) + scale_x // 2] = "E"
-        empty[(self.entry_y * (scale_y - 1)) + scale_y // 2][(self.entry_x * (scale_x - 1)) + scale_x // 2] = "S"
-            
-
+                        empty[vis_y + i][vis_x] = c + "|" + RESET
+                    empty[vis_y + (scale_y - 1)][vis_x] = c + "+" + RESET
+                    empty[vis_y][vis_x] = c + "+" + RESET
+        if show_hide:
+            for direction in self.direction_string:
+                vis_x = curr_x * (scale_x - 1)
+                vis_y = curr_y * (scale_y - 1)
+                if direction == "N":
+                    curr_y -= 1 
+                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = w + "o" + RESET
+                elif direction == "S":
+                    curr_y += 1
+                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = w +  "o" + RESET
+                elif direction == "E":
+                    curr_x += 1
+                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] =  w + "o" + RESET
+                elif direction == "W":
+                    curr_x -= 1
+                    empty[vis_y + scale_y // 2][vis_x + scale_x // 2] = w + "o" + RESET
+            empty[(self.entry_y * (scale_y - 1)) + scale_y // 2][(self.entry_x * (scale_x - 1)) + scale_x // 2] = RED + "S" + RESET
+            empty[(self.exit_y * (scale_y - 1)) + scale_y // 2][(self.exit_x * (scale_x - 1)) + scale_x // 2] = GREEN + "E" + RESET
         for row in empty:
             print("".join(row))
