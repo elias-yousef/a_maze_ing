@@ -115,19 +115,28 @@ def main() -> None:
         print("3. Rotate the maze color")
         print("4. Quit")
 
-        choice = input("Choice? (1-4) -> Chose 1 first to generate the maze: ")
-
         try:
+            choice = input("Choice? (1-4) -> \
+Chose 1 first to generate the maze: \n")
             num = int(choice)
         except ValueError:
+            print("##############################")
+            print("# Enter a number between 1-4 #")
+            print("##############################")
             continue
-
+        except KeyboardInterrupt:
+            print("############################################")
+            print("# [!] Ctrl+C detected. Shutting down safely #")
+            print("#############################################")
+            sys.exit(0)
+        except Exception as e:
+            print(f"unxpected error: {e}")
+            sys.exit(1)
         # Force the user to choose 1 first
         if first_try and num != 1:
             print("\n === Please chose one for the first time === \n")
             continue
 
-        # Handle Menu Choices
         if num == 1:
             first_try = False
             arr_numbers = generatemaze.back_trackinga_agorithm()
