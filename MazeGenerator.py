@@ -3,11 +3,31 @@ from collections import deque
 
 
 class MazeGenerator():
+    """
+    A class used to generate, solve, and visualize a maze.
+    """
     def __init__(
             self, width: int, height: int, is_perfect: bool,
             entry_x: int, entry_y: int, exit_x: int,
             exit_y: int
             ) -> None:
+        """
+        Initializes the MazeGenerator with specified dimensions, type,
+          and entry/exit points.
+
+        Args:
+            width (int): The width of the maze in cells.
+            height (int): The height of the maze in cells.
+            is_perfect (bool): Flag indicating if the maze should be a perfect
+              maze (True) or a playable board with loops (False).
+            entry_x (int): The x-coordinate of the maze entry.
+            entry_y (int): The y-coordinate of the maze entry.
+            exit_x (int): The x-coordinate of the maze exit.
+            exit_y (int): The y-coordinate of the maze exit.
+
+        Returns:
+            None
+        """
         self.width = width
         self.height = height
         self.is_perfect = is_perfect
@@ -18,6 +38,18 @@ class MazeGenerator():
         self.direction_string: str = ""
 
     def pattern_42(self) -> list[tuple[int, int]]:
+        """
+        Generates the coordinates for the "42" pattern to be carved
+          into the maze.
+
+        Calculates a fixed set of coordinates in the center
+          of the maze that will be skipped
+        during the wall-generation process to visually form the number "42".
+
+        Returns:
+            list[tuple[int, int]]: A list of (x, y) coordinate tuples
+              representing the "42" pattern.
+        """
         self.point_42 = []
         if self.width > 9 and self.height > 7:
             x = self.width // 2
@@ -43,6 +75,19 @@ class MazeGenerator():
         return self.point_42
 
     def back_trackinga_agorithm(self) -> list[list[int]]:
+        """
+        Generates a perfect maze using a randomized depth-first search
+          (backtracking) algorithm.
+
+        Initializes a grid where all walls are intact (represented by 15),
+          then carves
+        paths by tearing down walls using bitwise operations while avoiding
+          the "42" pattern.
+
+        Returns:
+            list[list[int]]: A 2D list representing the maze grid, where each
+            cell is an integer encoding its walls.
+        """
         skipped_point = self.pattern_42()
         self.arr = [[15 for i in range(
             self.width)] for j in range(self.height)]
@@ -96,6 +141,18 @@ class MazeGenerator():
         return self.arr
 
     def imperfect(self) -> list[list[int]]:
+        """
+        Modifies a perfect maze into an imperfect one
+          (playable board) by removing additional walls.
+
+        Iterates through the maze and selectively removes walls to create
+          loops and multiple
+        independent routes, making it suitable for a Pac-Man-like game.
+
+        Returns:
+            list[list[int]]: A 2D list representing the modified,
+              imperfect maze grid.
+        """
         x = 1
         y = 1
         length = (
@@ -158,6 +215,18 @@ class MazeGenerator():
         return self.arr
 
     def solve_maze_bfs(self) -> str:
+        """
+        Finds the shortest valid path from
+          the entry to the exit using Breadth-First Search (BFS).
+
+        Traverses the generated maze grid,
+          respecting the encoded walls and avoiding the
+        "42" pattern, to find the most direct route.
+
+        Returns:
+            str: A string of characters ('N', 'S', 'E', 'W')
+              representing the sequence of directions to solve the maze.
+        """
         start = (self.entry_x, self.entry_y)
         end = (self.exit_x, self.exit_y)
         skipped_point = self.pattern_42()
@@ -226,6 +295,22 @@ class MazeGenerator():
         return self.direction_string
 
     def draw_maze(self, show_hide: bool, color: int) -> None:
+        """
+        Renders the maze visually in the terminal using ASCII characters.
+
+        Draws the generated walls, the entry/exit points,
+          and optionally the shortest path
+        using terminal color codes.
+
+        Args:
+            show_hide (bool): Flag indicating whether to
+              show (True) or hide (False) the solution path.
+            color (int): An integer representing the color
+              theme choice for the maze rendering.
+
+        Returns:
+            None
+        """
         WHITE = '\033[37m'
         RED = '\033[91m'
         GREEN = '\033[92m'
@@ -246,7 +331,7 @@ class MazeGenerator():
         elif color == 3:
             c = BLUE
             w = CYAN
-        scale_x = 7
+        scale_x = 8
         scale_y = 5
         self.seed = True
         room_width = ((scale_x - 1) * self.width) + 1

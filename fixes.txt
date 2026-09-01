@@ -1,1 +1,1 @@
-fix the range of the maze
+look up for the maximum range of the maze you can do in the cluster disktop

@@ -19,7 +19,6 @@ def parse_config(file_path: str) -> dict[str, str]:
         if item not in argument:
             print(f"CRITICAL ERROR: missing required_item={item}")
             sys.exit(1)
-
     return argument
 
 
@@ -40,7 +39,11 @@ def validate_arguments(
     except ValueError:
         if_error = True
         print("width and height must be int values")
-
+    try:
+        if width < 3 or height < 3:
+            raise ValueError("width and hight must be < 3")
+    except ValueError as e:
+        list_ranges.append(e)
     try:
         perfect_val = argument["PERFECT"].lower()
         if perfect_val not in ("true", "false"):
@@ -59,24 +62,21 @@ def validate_arguments(
         if_error = True
         print("ENTRY and EXIT point must be x,y int values")
 
-    # 4. Check boundaries (only if parsing succeeded)
     if not if_error:
-        if entry_x > width or entry_x < 0:
+        if entry_x >= width or entry_x < 0:
             list_ranges.append("ENTRY_X out of range")
-        if exit_x > width or exit_x < 0:
+        if exit_x >= width or exit_x < 0:
             list_ranges.append("EXIT_X out of range")
-        if entry_y > height or entry_y < 0:
+        if entry_y >= height or entry_y < 0:
             list_ranges.append("ENTRY_Y out of range")
-        if exit_y > height or exit_y < 0:
+        if exit_y >= height or exit_y < 0:
             list_ranges.append("EXIT_Y out of range")
 
-    # Print range errors if any exist
     if list_ranges:
         for error in list_ranges:
             print(error)
         if_error = True
 
-    # Exit if any validation failed
     if if_error:
         sys.exit(1)
 
@@ -88,13 +88,11 @@ def main() -> None:
         print("missing config file")
         sys.exit(1)
 
-    # 1. Read and Validate Config
     config_file = sys.argv[1]
     argument = parse_config(config_file)
     (width, height, is_perfect, entry_x,
         entry_y, exit_x, exit_y) = validate_arguments(argument)
 
-    # 2. Initialize MazeGenerator
     generatemaze = MazeGenerator(
         width, height,
         is_perfect,
@@ -102,12 +100,10 @@ def main() -> None:
         exit_x, exit_y
     )
 
-    # 3. Setup Menu Variables
     draw = False
     first_try = True
     color = 0
 
-    # 4. Main Application Loop
     while True:
         print("*===* A-Maze-ing *===*")
         print("1. Generate a new maze")
@@ -132,11 +128,9 @@ Chose 1 first to generate the maze: \n")
         except Exception as e:
             print(f"unxpected error: {e}")
             sys.exit(1)
-        # Force the user to choose 1 first
         if first_try and num != 1:
             print("\n === Please chose one for the first time === \n")
             continue
-
         if num == 1:
             first_try = False
             arr_numbers = generatemaze.back_trackinga_agorithm()
