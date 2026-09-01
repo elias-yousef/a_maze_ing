@@ -28,7 +28,7 @@ def validate_arguments(
     """Validates the parsed arguments and ensures
     they are the correct data types/bounds """
     if_error = False
-    list_ranges = []
+    list_ranges: list[str] = []
 
     width = height = entry_x = entry_y = exit_x = exit_y = 0
     is_perfect = False
@@ -43,7 +43,7 @@ def validate_arguments(
         if width < 3 or height < 3:
             raise ValueError("width and hight must be < 3")
     except ValueError as e:
-        list_ranges.append(e)
+        list_ranges.append(str(e))
     try:
         perfect_val = argument["PERFECT"].lower()
         if perfect_val not in ("true", "false"):
