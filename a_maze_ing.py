@@ -1,5 +1,5 @@
 import sys
-from MazeGenerator import MazeGenerator
+from src.MazeGenerator import MazeGenerator
 
 
 def parse_config(file_path: str) -> dict[str, str]:

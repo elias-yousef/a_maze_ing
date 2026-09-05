@@ -142,76 +142,69 @@ class MazeGenerator():
 
     def imperfect(self) -> list[list[int]]:
         """
-        Modifies a perfect maze into an imperfect one
-          (playable board) by removing additional walls.
-
-        Iterates through the maze and selectively removes walls to create
-          loops and multiple
-        independent routes, making it suitable for a Pac-Man-like game.
-
-        Returns:
-            list[list[int]]: A 2D list representing the modified,
-              imperfect maze grid.
+        Modifies a perfect maze into an imperfect one (playable board)
+        by finding and eliminating dead-ends to create loops.
         """
-        x = 1
-        y = 1
-        length = (
-            self.width * self.height) - (
-                self.height * 2 - 2) - (self.width * 2 - 2)
-        while length > 0:
-            if ((
-                (self.arr[y - 1][x + 1] & 4) == 4 or (
-                    self.arr[y - 1][x + 1] & 8) == 8 or (
-                        self.arr[y][x + 1] & 8) == 8) and (
-                            (self.arr[y - 1][x - 1] & 2) == 2 or (
-                                self.arr[y - 1][x - 1] & 4) == 4 or (
-                                    self.arr[y][x - 1] & 2) == 2) and (
-                                        (self.arr[y][x] & 1) == 1
-                                    )):
-                if self.arr[y - 1][x] != 15 and self.arr[y][x] != 15:
-                    self.arr[y][x] -= 1
-                    self.arr[y - 1][x] -= 4
-            if ((
-                (self.arr[y + 1][x + 1] & 8) == 8 or (
-                    self.arr[y + 1][x + 1] & 1) == 1 or (
-                        self.arr[y][x + 1] & 8) == 8) and (
-                            (self.arr[y + 1][x - 1] & 2) == 2 or (
-                                self.arr[y + 1][x - 1] & 1) == 1 or (
-                                    self.arr[y][x - 1] & 2) == 2) and (
-                                        (self.arr[y][x] & 4) == 4
-                                    )):
-                if self.arr[y + 1][x] != 15 and self.arr[y][x] != 15:
-                    self.arr[y + 1][x] -= 1
-                    self.arr[y][x] -= 4
-            if ((
-                (self.arr[y - 1][x + 1] & 8) == 8 or (
-                    self.arr[y - 1][x + 1] & 4) == 4 or (
-                        self.arr[y - 1][x] & 4) == 4) and (
-                            (self.arr[y + 1][x + 1] & 1) == 1 or (
-                                self.arr[y + 1][x + 1] & 8) == 8 or (
-                                    self.arr[y + 1][x] & 1) == 1) and (
-                                        (self.arr[y][x] & 2) == 2
-                                    )):
-                if self.arr[y][x + 1] != 15 and self.arr[y][x] != 15:
-                    self.arr[y][x] -= 2
-                    self.arr[y][x + 1] -= 8
-            if ((
-                (self.arr[y - 1][x - 1] & 2) == 2 or (
-                    self.arr[y - 1][x - 1] & 4) == 4 or (
-                        self.arr[y - 1][x] & 4) == 4) and (
-                            (self.arr[y + 1][x - 1] & 1) == 1 or (
-                                self.arr[y + 1][x - 1] & 2) == 2 or (
-                                    self.arr[y + 1][x] & 1) == 1) and (
-                                        (self.arr[y][x] & 8) == 8
-                                    )):
-                if self.arr[y][x - 1] != 15 and self.arr[y][x] != 15:
-                    self.arr[y][x] -= 8
-                    self.arr[y][x - 1] -= 2
-            x += 1
-            if x == self.width - 1:
-                y += 1
-                x = 1
-            length -= 1
+        skipped_point = self.pattern_42()
+
+        while True:
+            dead_ends = []
+
+            for y in range(self.height):
+                for x in range(self.width):
+                    if (x, y) in skipped_point:
+                        continue
+
+                    if bin(self.arr[y][x]).count('1') == 3:
+                        dead_ends.append((x, y))
+
+            if not dead_ends:
+                break
+
+            broken_wall = False
+            for x, y in dead_ends:
+                if bin(self.arr[y][x]).count('1') != 3:
+                    continue
+
+                val = self.arr[y][x]
+                removable_walls = []
+
+                # Check North (1) - subtract 1 here,
+                # subtract 4 (South) from neighbor
+                if val & 1 and y > 0 and (x, y - 1) not in skipped_point:
+                    removable_walls.append((x, y - 1, 1, 4))
+                # Check East (2) - subtract 2 here,
+                # subtract 8 (West) from neighbor
+                if (
+                    val & 2 and x < self.width - 1 and (
+                        x + 1, y) not in skipped_point
+                ):
+                    removable_walls.append((x + 1, y, 2, 8))
+                # Check South (4) - subtract 4 here,
+                # subtract 1 (North) from neighbor
+                if (
+                    val & 4 and y < self.height - 1 and (
+                        x, y + 1) not in skipped_point
+                ):
+                    removable_walls.append((x, y + 1, 4, 1))
+                # Check West (8) - subtract 8 here,
+                # subtract 2 (East) from neighbor
+                if val & 8 and x > 0 and (x - 1, y) not in skipped_point:
+                    removable_walls.append((x - 1, y, 8, 2))
+
+                # If there is a valid wall to break,
+                # pick one randomly and tear it down
+                if removable_walls:
+                    nx, ny, wall_val, opp_val = random.choice(removable_walls)
+                    self.arr[y][x] -= wall_val
+                    self.arr[ny][nx] -= opp_val
+                    broken_wall = True
+
+            # Prevent an infinite loop if remaining dead
+            # ends are completely trapped (e.g. by borders and 42)
+            if not broken_wall:
+                break
+
         return self.arr
 
     def solve_maze_bfs(self) -> str:

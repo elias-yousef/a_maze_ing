@@ -1,59 +1,51 @@
 # A-Maze-ing
 
-*This activity has been created as part of the 42 curriculum by eabushak.*
+*This activity has been created as part of the 42 curriculum by eabushak, aabuzanh.*
 
 ## Description
-A-Maze-ing is a Python-based maze generator and visualizer. The program reads configuration parameters from a file to generate either a perfect maze (a single valid path) or a playable board (an imperfect maze with loops and multiple routes). It ensures the maze contains a visually distinct "42" pattern in its center, saves the structural output in a specific hexadecimal format, and provides an interactive terminal ASCII rendering for users to view the maze and its shortest solution path.
+This project is a maze generator implemented in Python that takes a configuration file to generate a maze. It is capable of generating both "perfect" mazes—which contain exactly one unique path between the entry and exit—and "imperfect" playable boards with loops and no dead-ends, akin to a Pac-Man level. The program writes the maze data to an output file using hexadecimal wall representation and provides an interactive visual rendering of the maze and its solution path.
 
 ## Instructions
-### Prerequisites
-- Python 3.10 or later.
-- Make (for running automation commands).
-
-### Installation & Execution
-A `Makefile` is provided to automate standard tasks:
-- **Install dependencies:** `make install`
-- **Run the program:** `make run` (Alternatively: `python3 a_maze_ing.py config.txt`)
-- **Lint the code:** `make lint` (Runs flake8 and mypy)
-- **Clean cache/artifacts:** `make clean`
-- **Debug mode:** `make debug`
+A `Makefile` is included to automate common tasks. 
+*   **Installation:** Run `make install` to install dependencies.
+*   **Execution:** Run `python3 a_maze_ing.py config.txt` (or replace `config.txt` with your chosen configuration file name) to launch the generator.
+*   **Debugging:** Run `make debug` to execute the script in debug mode.
+*   **Linting:** Run `make lint` to check the code against `flake8` and `mypy` standards.
+*   **Cleanup:** Run `make clean` to remove temporary files or caches.
 
 ## Configuration File Format
-The generator requires a configuration file passed as an argument. The file uses a `KEY=VALUE` format, one pair per line (lines starting with `#` are ignored). 
-
-**Mandatory Keys:**
-- `WIDTH`: Maze width (number of cells)
-- `HEIGHT`: Maze height
-- `ENTRY`: Entry coordinates (x,y)
-- `EXIT`: Exit coordinates (x,y)
-- `OUTPUT_FILE`: Output filename (e.g., `maze.txt`)
-- `PERFECT`: Boolean flag (`True` for a perfect maze, `False` for an imperfect playable board)
+The program requires a configuration file containing one `KEY=VALUE` pair per line. Lines starting with `#` are treated as comments and ignored. The mandatory keys are:
+*   **`WIDTH`**: Maze width (number of cells).
+*   **`HEIGHT`**: Maze height.
+*   **`ENTRY`**: Entry coordinates (x,y).
+*   **`EXIT`**: Exit coordinates (x,y).
+*   **`OUTPUT_FILE`**: Output filename.
+*   **`PERFECT`**: Is the maze perfect?.
 
 ## Maze Generation Algorithm
-1. **Generation (Perfect Maze):** The core generation relies on a **Randomized Depth-First Search (Backtracking)** algorithm. It starts with a grid fully populated with walls and iteratively carves paths by breaking down walls between neighboring cells using bitwise operations, backtracking only when it hits a dead end. The algorithm explicitly skips the coordinates that make up the "42" pattern.
-2. **Modification (Imperfect Maze):** If the `PERFECT` flag is `False`, a custom wall-removal algorithm is applied over the generated perfect maze to strategically knock down additional walls, creating loops and eliminating dead-ends to make it suitable for a Pac-Man-like playable board.
-3. **Pathfinding:** The shortest path between the entry and exit points is calculated using **Breadth-First Search (BFS)**, guaranteeing the most direct route is found and visually rendered.
-
-## Why These Algorithms?
-- **DFS (Backtracking):** Chosen for its efficiency in generating highly winding, complex perfect mazes with long corridors. It is relatively straightforward to implement using a stack and makes it simple to carve around reserved spaces (like the "42" pattern).
-- **BFS:** Chosen for the solver because it is mathematically guaranteed to find the shortest path in an unweighted grid, which is required by the subject for the solution string and visual display.
+*   **Algorithm Used:** Randomized Depth-First Search (Recursive Backtracker) for generation, and Breadth-First Search (BFS) for the solution pathfinding. 
+*   **Why we chose it:** The recursive backtracker efficiently carves deep, winding corridors, making it ideal for generating challenging perfect mazes. For the imperfect maze mode, we implemented a custom algorithm that systematically hunts down dead-ends using bitwise operations, opening them up to create a cohesive, looped board without violating the maximum room-size constraints.
 
 ## Code Reusability
-The maze generation logic is entirely decoupled from the CLI and display logic. It is encapsulated within the `MazeGenerator` class in a standalone module. 
+The core maze generation logic has been implemented as a standalone, reusable class inside the `mazegen` package. 
+*   **Installation:** The package is provided as a `mazegen-*.whl` file at the root of the repository. You can install it via pip: `pip install ./mazegen-1.0.0-py3-none-any.whl`.
+*   **Usage:** Once installed, you can import and instantiate it in any Python script:
+    ```python
+    from mazegen.MazeGenerator import MazeGenerator
+    
+    # Example instantiation
+    maze = MazeGenerator(width=20, height=15, is_perfect=True, entry_x=0, entry_y=0, exit_x=19, exit_y=14)
+    grid = maze.back_trackinga_agorithm() # Access generated structure
+    ```
 
-**How to reuse the package:**
-1. Build the package from the root of this repository.
-2. Install it via pip: `pip install mazegen-1.0.0-py3-none-any.whl` (or the `.tar.gz` equivalent).
-3. Import and use it in your Python projects:
+## Team and Project Management
+*   **Roles:** 
+    *   **eabushak:** Developed the core `MazeGenerator` class, the maze generation algorithms, and the main `a_maze_ing.py` execution script.
+    *   **aabuzanh:** Handled everything else, including parsing the configuration file, formatting the output file, creating the `Makefile`, building the reusable `.whl` package, and writing the documentation.
+*   **Planning:** We divided the tasks clearly from the beginning based on the required files and modules. We anticipated that splitting the core generation logic from the peripheral requirements (configuration, output formatting, packaging) would allow us to work in parallel efficiently.
+*   **What worked well / Could be improved:** The clear separation of concerns worked very well and allowed for independent progress. However, combining the core generator with the output formatting and packaging requirements took extra coordination at the end. We could improve by integrating our modules earlier in the development process to catch integration issues sooner.
+*   **Specific Tools Used:** Python 3, Visual Studio Code, Git, GitHub, Make, flake8, mypy.
 
-```python
-from MazeGenerator import MazeGenerator
-
-# Initialize the generator
-maze = MazeGenerator(width=20, height=15, is_perfect=True, entry_x=0, entry_y=0, exit_x=19, exit_y=14)
-
-# Generate the maze structure
-maze_grid = maze.back_trackinga_agorithm()
-
-# Find the shortest path
-solution = maze.solve_maze_bfs()
+## Resources
+*   **References:** Wikipedia references on Maze generation algorithms and Breadth-first search; Python documentation for the `typing` and `collections` modules.
+*   **AI Usage:** AI was utilized as an interactive assistant to help troubleshoot `mypy` module import errors related to Python's `src/` directory package structure, refine the bitwise logic for removing dead-ends while respecting room-size limits, and clarify `.whl` packaging deployment steps. All AI-assisted logic was thoroughly peer-reviewed to ensure full comprehension before integration.
